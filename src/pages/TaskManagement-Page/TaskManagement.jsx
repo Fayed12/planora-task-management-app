@@ -1,0 +1,176 @@
+// local
+import styles from './TaskManagement.module.css';
+import { getTasksData } from '../../Redux/tasksSlice';
+import MainButton from '../../ui/button/MainButton';
+import TaskCard from '../../components/task-card/TaskCard';
+import FilterBar from '../../components/filterBar/filterBarSection';
+import updateData from '../../firebase/updateExistingData';
+import Pagination from '../../components/Pagination-footer/Pagination';
+import ActionsButtons from '../../components/actions-buttons/actionsButtons';
+import TaskDetails from '../../components/task-details/taskDetails';
+import CreateNewItem from '../../components/create-edit-new-item/createEditNewItem';
+import useConfirm from '../../hooks/confirm';
+import EmptyBox from '../../components/empty-box/emptyBox';
+import deleteItem from '../../firebase/deleteDocument';
+
+// redux
+import { useSelector } from 'react-redux';
+
+// react
+import { useState } from 'react';
+
+// react icons
+import {
+    MdGridView,
+    MdViewList,
+    MdAdd,
+    MdFlag,
+    MdDateRange,
+    MdLock
+} from 'react-icons/md';
+
+const TaskManagement = () => {
+    const tasksData = useSelector(getTasksData);
+
+    const confirmAction = useConfirm()
+
+    const [tasksAfterFilter, setTasksAfterFilter] = useState(tasksData)
+    const [openDetailsPopup, setOpenDetailsPopup] = useState(false)
+    const [selectedTask, setSelectedTask] = useState(null)
+    const [openCreateNewTask, setOpenCreateNewTask] = useState(false)
+    const [formAction, setFromAction] = useState("")
+    const [editTaskData, setEditTaskData] = useState({})
+
+    // State for UI controls
+    const [viewMode, setViewMode] = useState('grid');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // handle delete task
+    async function handleDeleteTask(id) {
+        const confirmed = await confirmAction({
+            title: "Delete Task?",
+            text: `Are you sure you want to delete this task?`,
+            confirmText: "Yes, delete!",
+            cancelText: "Cancel",
+        })
+        if (confirmed) {
+            deleteItem("tasks", id)
+        } else {
+            return
+        }
+    }
+
+    return (
+        <>
+            <div className={styles.container}>
+                {/* Header Section */}
+                <header className={styles.header}>
+                    <div className={styles.titleGroup}>
+                        <h1 className={styles.title}>All Tasks</h1>
+                        <p className={styles.subtitle}>Manage your tasks effectively</p>
+                    </div>
+
+                    <div className={styles.headerActions}>
+                        <MainButton
+                            type='button'
+                            title="Create Task"
+                            content={<><MdAdd /> New Task</>}
+                            clickEvent={() => { setOpenCreateNewTask(!openCreateNewTask); setFromAction("addNewItem") }}
+                        />
+
+                        <div className={styles.viewToggle}>
+                            <button
+                                className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.active : ''}`}
+                                onClick={() => setViewMode('grid')}
+                                title="Grid View"
+                            >
+                                <MdGridView />
+                            </button>
+                            <button
+                                className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.active : ''}`}
+                                onClick={() => setViewMode('list')}
+                                title="List View"
+                            >
+                                <MdViewList />
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                {/* Controls Section (Search & Filters) */}
+                <>
+                    <FilterBar originalData={tasksData} setMainData={setTasksAfterFilter} />
+                </>
+
+                <div className={styles.tasksLength}>
+                    <p>tasks/ <span>{tasksAfterFilter.length}</span></p>
+                </div>
+
+                {/* Workspace Section */}
+                <div className={styles.workspace}>
+                    {!tasksAfterFilter || tasksAfterFilter.length === 0 ?
+                        (
+                            <EmptyBox title={"Tasks"} navigateFunc={() => { setOpenCreateNewTask(!openCreateNewTask); setFromAction("addNewItem") }} />
+                        ) :
+                        (
+                            viewMode === 'grid' ? (
+                                <div className={styles.grid}>
+                                    {(tasksAfterFilter.slice(0, (10 * currentPage))).map(task => (
+                                        <TaskCard setEditTaskData={setEditTaskData} key={task.id} task={task} openCreateNewTask={openCreateNewTask} setOpenCreateNewTask={setOpenCreateNewTask} setFromAction={setFromAction} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className={styles.list}>
+                                    {tasksAfterFilter.map(task => (
+                                        <div key={task.id} className={styles.listRow}>
+                                            <div className={styles.rowHeader}>
+                                                {(new Date() < new Date(task?.dueDate).getTime() && !task?.isCompleted) && <input type="checkbox" checked={task.isCompleted} className={styles.rowCheckbox} onChange={() => updateData("tasks", task.id, { isCompleted: !task.isCompleted })} />}
+                                                <span className={`${styles.rowTitle} ${task.isCompleted ? styles.completed : ''}`}>
+                                                    {task.title}
+                                                </span>
+                                            </div>
+                                            <div className={`${styles.rowMeta} ${styles.hidden}`}>
+                                                <MdFlag style={{
+                                                    color: task.priority === 'high' ? 'var(--error-500)' :
+                                                        task.priority === 'medium' ? 'var(--warning-500)' : 'var(--success-500)'
+                                                }} />
+                                                {task.priority}
+                                            </div>
+                                            <div className={`${styles.rowMeta} ${styles.hidden}`}>
+                                                <MdDateRange />
+                                                {new Date(task.dueDate).toLocaleDateString()}
+                                            </div>
+                                            <div className={styles.rowMeta}>
+                                                <MdLock />
+                                                {task.privacy}
+                                            </div>
+                                            <div className={styles.actions}>
+                                                <ActionsButtons actionType={"task"} setEditTaskData={setEditTaskData} openCreateNewTask={openCreateNewTask} setOpenCreateNewTask={setOpenCreateNewTask} setFromAction={setFromAction} deleteItem={() => handleDeleteTask(task.id)} task={task} setSelectedTask={setSelectedTask} openDetailsPopup={openDetailsPopup} setOpenDetailsPopup={setOpenDetailsPopup} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        )
+                    }
+                </div>
+
+                {/* Pagination Footer */}
+                {tasksAfterFilter.length > 10 ? (
+                    <Pagination allData={tasksAfterFilter} setCurrentPage={setCurrentPage} currentPage={currentPage} />
+                ) :
+                    (
+                        <div className={styles.results}>
+                            <p>{tasksAfterFilter.length} results </p>
+                        </div>
+                    )}
+
+            </div>
+            {/* this details is exist for the row grid show not to the card */}
+            {openDetailsPopup && <TaskDetails taskData={selectedTask} onClose={() => setOpenDetailsPopup(false)} />}
+            {openCreateNewTask && <CreateNewItem formAction={formAction} itemName={"task"} closeFunc={() => setOpenCreateNewTask(!openCreateNewTask)} taskEditDefaultData={editTaskData} />}
+        </>
+    );
+};
+
+export default TaskManagement;

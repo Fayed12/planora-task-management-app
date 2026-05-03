@@ -1,0 +1,419 @@
+.calendarContainer {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding: var(--space-lg);
+    background-color: var(--bg-50);
+    color: var(--text-900);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.monthTitle {
+    font-weight: 700 !important;
+    color: var(--text-900);
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.todayBtn {
+    color: var(--primary-600) !important;
+    border-color: var(--primary-600) !important;
+    text-transform: none !important;
+    font-weight: 600 !important;
+}
+
+.navBtn {
+    color: var(--text-700) !important;
+    background-color: var(--bg-200) !important;
+}
+.navBtn:hover {
+    background-color: var(--bg-300) !important;
+}
+
+.daysRow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: var(--space-xs);
+}
+
+.dayName {
+    text-align: center;
+    color: var(--text-500);
+    font-weight: 600;
+    padding: var(--space-xs) 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headerSection {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+    border-bottom: 1px solid var(--border-200);
+    margin-bottom: var(--space-md);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-md);
+    padding: var(--space-xs);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: minmax(120px, auto);
+    gap: 1px;
+    background-color: var(--border-200);
+    border: 1px solid var(--border-200);
+    border-radius: var(--radius-md);
+}
+
+.dayCell {
+    background-color: var(--bg-50) !important;
+    padding: var(--space-sm);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: 120px;
+    border-radius: 0 !important;
+}
+
+.dayCell:hover {
+    background-color: var(--bg-100) !important;
+}
+
+.outsideMonth {
+    opacity: 0.5;
+    background-color: var(--bg-100) !important;
+}
+
+.today {
+    border: 2px solid var(--info-500) !important;
+    position: relative;
+    z-index: 1;
+}
+
+.dayNumber {
+    font-size: var(--text-sm) !important;
+    font-weight: 600 !important;
+    color: var(--text-700);
+    margin-bottom: var(--space-xs) !important;
+    align-self: flex-end;
+}
+
+.todayText {
+    color: var(--info-500) !important;
+}
+
+.itemsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+    flex: 1;
+}
+
+.itemPreview {
+    font-size: var(--text-xs);
+    padding: 2px 6px;
+    background-color: var(--bg-200);
+    border-radius: var(--radius-xs);
+    border-left: 3px solid transparent;
+    color: var(--text-800);
+}
+
+.itemPreviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.itemPreviewType {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--text-500);
+    text-transform: uppercase;
+}
+
+.itemPreviewIcons {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.completedIcon {
+    color: var(--success-500);
+    font-size: 0.8rem;
+}
+
+.pendingIcon {
+    color: var(--text-400);
+    font-size: 0.8rem;
+}
+
+.priorityIcon {
+    font-size: 0.8rem;
+}
+
+.itemTitle {
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
+    font-weight: 500 !important;
+}
+
+.completedItem .itemTitle,
+.completedItem.modalItem .modalItemTitle {
+    text-decoration: line-through;
+    color: var(--text-400) !important;
+}
+
+.moreLabel {
+    font-size: 0.7rem !important;
+    color: var(--text-500);
+    font-weight: 600 !important;
+    padding-left: 2px;
+}
+
+/* Modal Styles */
+.modalContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    background-color: var(--bg-50);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    outline: none;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--border-100);
+}
+
+.modalHeader h6 {
+    font-weight: 600;
+    color: var(--text-900);
+    width: fit-content;
+}
+
+.modalHeader button{
+    width: auto;
+}
+
+.modalBody {
+    padding: var(--space-lg);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.modalItem {
+    padding: var(--space-md);
+    border-radius: var(--radius-sm) !important;
+    border-left: 4px solid transparent !important;
+    background-color: var(--bg-200) !important;
+    color: var(--text-900) !important;
+}
+
+.modalItemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xs);
+}
+
+.modalItemTitle {
+    font-weight: 600 !important;
+    color: var(--text-900);
+    word-break: break-word;
+}
+
+.taskChip {
+    background-color: var(--primary-100) !important;
+    color: var(--primary-700) !important;
+    font-weight: 600 !important;
+    height: 24px !important;
+    font-size: 0.7rem !important;
+    padding: 0 8px !important;
+}
+
+.itemTypeChip {
+    background-color: var(--primary-100) !important;
+    color: var(--primary-700) !important;
+    font-weight: 600 !important;
+    height: 24px !important;
+}
+
+.modalItemContent {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+}
+
+.modalItemDetail {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--text-700);
+}
+
+.modalItemDetail svg {
+    font-size: 1.1rem;
+}
+
+.categoryIcon, .privacyIcon {
+    color: var(--text-500);
+}
+
+.statusCompleted {
+    color: var(--success-500) !important;
+    font-weight: 600;
+}
+
+.statusPending {
+    color: var(--warning-500) !important;
+    font-weight: 600;
+}
+
+.emptyState {
+    text-align: center;
+    padding: var(--space-xl) 0;
+}
+
+.emptyState p{
+    color: var(--text-900) !important;
+    font-weight: 600 !important;
+    font-size: var(--text-md) !important;
+}
+
+/* Responsiveness */
+@media (max-width: 1200px) {
+    .dayCell {
+        min-height: 100px;
+    }
+    .grid {
+        grid-auto-rows: minmax(100px, auto);
+    }
+}
+
+@media (max-width: 992px) {
+    .dayCell {
+        padding: var(--space-xs);
+    }
+    .itemTitle {
+        font-size: 0.7rem !important;
+    }
+    .modalContent {
+        width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendarContainer {
+        padding: var(--space-md);
+    }
+    
+    .dayCell {
+        min-height: 80px;
+    }
+    
+    .grid {
+        grid-auto-rows: minmax(80px, auto);
+    }
+    
+    .itemPreview {
+        padding: 2px 4px;
+    }
+    
+    .modalContent {
+        width: 95%;
+    }
+}
+
+@media (max-width: 500px) {
+    .calendarContainer {
+        padding: var(--space-sm);
+    }
+    
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .headerActions {
+        flex-direction: column;
+        width: 100%;
+        gap: var(--space-sm);
+    }
+    
+    .headerActions > button {
+        width: 100%;
+    }
+    
+    .dayName h6,
+    .dayName span,
+    .dayName p,
+    .dayName * {
+        font-size: 0.65rem !important;
+    }
+    
+    .dayCell {
+        min-height: 60px;
+        padding: 2px;
+    }
+    
+    .grid {
+        grid-auto-rows: minmax(60px, auto);
+    }
+    
+    /* Hide Text content */
+    .itemTitle,
+    .itemPreviewType {
+        display: none !important;
+    }
+    
+    /* Center the remaining icon */
+    .itemPreviewHeader {
+        justify-content: center;
+        margin-bottom: 0;
+    }
+    
+    .itemPreviewIcons {
+        gap: 0;
+    }
+    
+    .itemPreview {
+        padding: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
